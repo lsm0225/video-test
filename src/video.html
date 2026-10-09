@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>성문고 홍보영상 애니매틱</title>
+<style>
+  html,body{margin:0;background:#000;overflow:hidden}
+  #stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:#000;font-family:"Noto Sans CJK KR","Noto Sans KR",sans-serif}
+  #cuts{position:absolute;inset:0;z-index:0}
+  .ov{z-index:100}
+  #tag{z-index:200}
+  .cut{position:absolute;inset:0;overflow:hidden;display:none;background:#000}
+  .rot{position:absolute;inset:0;transform-origin:50% 50%}
+  .cut img.bg{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+  .ov{position:absolute;inset:0;pointer-events:none}
+  #grad{background:linear-gradient(to top,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 16%,rgba(0,0,0,0) 34%),radial-gradient(ellipse at center,rgba(0,0,0,0) 58%,rgba(0,0,0,.34) 100%)}
+  #flash{background:#fff;opacity:0}
+  #dark{background:#000;opacity:0}
+  /* 자막 */
+  .sub{position:absolute;left:0;right:0;bottom:92px;text-align:center;color:#fff;opacity:0}
+  .sub .m{font-weight:700;font-size:56px;letter-spacing:-.01em;line-height:1.25;text-shadow:0 2px 14px rgba(0,0,0,.75),0 0 2px rgba(0,0,0,.6)}
+  .sub .s{margin-top:14px;font-weight:500;font-size:30px;letter-spacing:.01em;opacity:.92;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .sub .s::before,.sub .s::after{content:"";display:inline-block;width:34px;height:2px;background:#f2c14e;vertical-align:middle;margin:0 16px 6px}
+  .sub.title{bottom:150px}
+  .sub.title .m{font-family:"Noto Serif CJK KR",serif;font-weight:600;font-size:62px;letter-spacing:.14em}
+  .sub.copy{bottom:120px}
+  .sub.copy .m{font-family:"Noto Serif CJK KR",serif;font-weight:700;font-size:66px;letter-spacing:.02em}
+  .sub.slogan{bottom:auto;top:680px}
+  .sub.slogan .m{font-family:"Noto Serif CJK KR",serif;font-weight:900;font-size:112px;line-height:1.28;letter-spacing:.01em;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+  .sub.slogan .m small{display:block;font-size:64px;font-weight:600;letter-spacing:.12em;margin-bottom:10px}
+  /* 컷 표시 태그 */
+  #tag{position:absolute;z-index:200;left:56px;top:46px;display:flex;gap:10px;align-items:center;font-family:Inter,"Noto Sans CJK KR",sans-serif;font-size:21px;color:#fff}
+  #tag span{padding:7px 14px;border-radius:6px;background:rgba(0,0,0,.46);backdrop-filter:none;letter-spacing:.04em}
+  #tag .c{background:#f2c14e;color:#1a1a1a;font-weight:700}
+  #tag.light span{background:rgba(0,0,0,.08);color:#444}
+  #tag.light .c{background:#1d2a5b;color:#fff}
+  /* C-06 벽 개방 */
+  .door{position:absolute;top:0;bottom:0;width:27%;background:linear-gradient(90deg,#17120d,#2a2118);box-shadow:0 0 60px rgba(0,0,0,.7)}
+  .door.l{left:0;border-right:3px solid rgba(255,225,170,.5)} .door.r{right:0;border-left:3px solid rgba(255,225,170,.5)}
+  /* C-09 엠블럼 */
+  .emb{position:absolute;display:flex;align-items:center;gap:14px;padding:16px 26px 16px 18px;border-radius:22px;background:rgba(255,255,255,.92);color:#143c2b;font-weight:700;font-size:32px;box-shadow:0 10px 34px rgba(0,0,0,.35);opacity:0;white-space:nowrap}
+  .emb i{width:46px;height:46px;border-radius:50%;background:#1f7a4d;display:inline-block;position:relative}
+  .emb i::after{content:"";position:absolute;left:13px;top:11px;width:16px;height:22px;border:solid #fff;border-width:0 5px 5px 0;transform:rotate(40deg) scale(.7)}
+  /* C-11 키워드 */
+  .kwrow{position:absolute;left:0;white-space:nowrap;color:#fff;font-weight:700;text-shadow:0 0 18px rgba(120,255,190,.75),0 2px 8px rgba(0,0,0,.6)}
+  .kwrow span{margin:0 34px}
+  /* C-12 시설 라벨 */
+  .lab{position:absolute;transform:translate(-50%,-50%) scale(0);padding:10px 22px;border-radius:999px;background:#fff;color:#1d2a5b;font-weight:800;font-size:34px;box-shadow:0 8px 26px rgba(0,0,0,.4)}
+  /* C-34 로고 자리 */
+  #logo{position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1d2a5b}
+  #logo .n{font-family:"Noto Serif CJK KR",serif;font-weight:900;font-size:124px;letter-spacing:.08em;opacity:0}
+  #logo .l{width:0;height:3px;background:#f2c14e;margin:26px 0}
+  #logo .p{font-size:26px;color:#9aa0ad;letter-spacing:.04em;opacity:0}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="cuts"></div>
+  <div class="ov" id="dark"></div>
+  <div class="ov" id="grad"></div>
+  <div class="ov" id="fx"></div>
+  <div class="ov" id="subs"></div>
+  <div class="ov" id="flash"></div>
+  <div id="tag"></div>
+</div>
+<script>
+const TL = /*TIMELINE*/null;
+const REF = "/*REF*/";
+const SHOW_TAG = /*SHOW_TAG*/true;
+const SCENES = {1:"시작의 조준",2:"실력의 정점",3:"승리의 정점",4:"만족의 정점",5:"우리들의 정점"};
+
+// 컷별 연출: img=참고 이미지 번호, shot=샷 크기, k=[진행률, 배율, 초점x, 초점y, 회전] 키프레임
+const SPEC = {
+  C01:{img:1, shot:"ECU", k:[[0,1.22,.5,.5,0],[1,1.42,.52,.5,0]], shake:2.2, tin:{fade:1.2}},
+  C02:{img:2, shot:"ECU", k:[[0,1.12,.6,.45,0],[1,1.34,.63,.42,0]], shake:1.2, tin:{fade:.5}},
+  C03:{img:3, shot:"MS · Follow", k:[[0,1.28,.3,.55,0],[.17,1.3,.3,.55,0],[.62,1.22,.8,.4,0,"out"],[1,1.2,.86,.38,0]], shake:1.5},
+  C04:{img:4, shot:"EWS · Drone", k:[[0,1.45,.5,.2,0],[1,1.02,.5,.62,0,"out"]], tin:{fade:.35}},
+  C05:{img:5, shot:"WS", k:[[0,1.6,.72,.5,0],[1,1.02,.5,.5,0,"out"]], tin:{fade:.9}},
+  C06:{img:6, shot:"MS+WS · Tilt-up", k:[[0,1.3,.52,.78,0],[.45,1.26,.52,.7,0],[1,1.06,.5,.36,0]], door:true},
+  C07:{img:7, shot:"Two-shot", k:[[0,1.04,.48,.5,0],[1,1.2,.5,.46,0]], tin:{fade:.5}},
+  C08:{img:8, shot:"CU", k:[[0,1.36,.34,.72,0],[.55,1.3,.76,.42,0],[1,1.36,.78,.4,0]], tin:{fade:.4}},
+  C09:{img:9, shot:"CU · Graphic", k:[[0,1.16,.6,.58,0],[1,1.32,.64,.6,0]], emblems:true},
+  C10:{img:10, shot:"CU", k:[[0,1.62,.62,.62,0],[1,1.04,.56,.5,0,"out"]]},
+  C11:{img:11, shot:"Insert · Graphic", k:[[0,1.04,.5,.5,0],[1,1.16,.5,.52,0]], keywords:true},
+  C12:{img:12, shot:"Insert · Photo", k:[[0,2.7,.5,.5,-10],[.4,1.0,.5,.5,0,"out"],[1,1.0,.5,.5,0]], labels:true},
+  C13:{img:13, shot:"MS+ECU · Static", k:[[0,1.2,.36,.4,0],[1,1.12,.4,.42,0]], pulse:.02},
+  C14:{img:14, shot:"WS+MS · Pan", k:[[0,1.3,.2,.5,0],[.5,1.26,.62,.5,0,"in"],[.56,1.36,.68,.48,0],[1,1.3,.8,.5,0,"out"]], shake:3, pulse:.025},
+  C15:{img:15, shot:"ECU", k:[[0,1.18,.52,.5,0],[1,1.44,.54,.46,0]], breathe:true},
+  C16:{img:16, shot:"MS", k:[[0,1.0,.5,.5,0],[1,1.12,.62,.46,0]], tin:{fade:.7}},
+  C17:{img:17, shot:"MS+CU · Rack Focus", k:[[0,1.24,.28,.55,0],[1,1.3,.6,.5,0]], rack:true},
+  C18:{img:18, shot:"CU", k:[[0,1.02,.5,.5,0],[.22,1.24,.5,.44,0,"out"],[1,1.3,.5,.44,0]], pulse:.02},
+  C19:{img:19, shot:"Insert · Photo", k:[[0,1.5,.5,.5,5],[.3,1.04,.5,.5,0,"out"],[1,1.0,.5,.5,0]]},
+  C20:{img:20, shot:"EWS+MS · Drone", k:[[0,1.36,.3,.38,0],[1,1.1,.62,.55,0]], tin:{fade:.3}},
+  C21:{img:21, shot:"MS+CU", k:[[0,1.06,.42,.5,0],[1,1.2,.62,.48,0]]},
+  C22:{img:22, shot:"WS+MS", k:[[0,1.0,.5,.5,0],[1,1.2,.44,.46,0]], tin:{fade:.6}},
+  C23:{img:23, shot:"WS", k:[[0,1.12,.28,.52,0],[1,1.12,.72,.52,0]]},
+  C24a:{img:24, shot:"WS+MS", label:"C-24", k:[[0,1.5,.22,.55,0],[1,1.56,.34,.52,0]], tin:{fade:.4}},
+  C24b:{img:24, shot:"WS+MS", label:"C-24", k:[[0,1.7,.66,.5,0],[1,1.5,.58,.5,0]]},
+  C24c:{img:24, shot:"WS+MS", label:"C-24", k:[[0,1.12,.5,.5,0],[1,1.04,.5,.5,0]], pulse:.045, tint:"linear-gradient(120deg,rgba(255,60,160,.22),rgba(60,120,255,.2))"},
+  C25:{img:25, shot:"MS (뒷모습)", k:[[0,1.0,.5,.5,0],[1,1.62,.62,.42,0,"in"]], dark:.3, shake:.8},
+  C26:{img:26, shot:"MS+CU", k:[[0,1.4,.42,.45,0],[.2,1.12,.46,.46,0,"out"],[1,1.02,.5,.5,0]]},
+  C27:{img:27, shot:"CU · Dolly-in", k:[[0,1.16,.74,.5,0],[.55,1.16,.3,.5,0],[1,1.58,.25,.46,0]]},
+  C28:{img:28, shot:"WS", k:[[0,1.24,.38,.55,0],[1,1.06,.6,.5,0]], tin:{fade:.5}},
+  C29a:{img:29, shot:"CU 시리즈", label:"C-29", k:[[0,1.06,.7,.42,0],[1,1.16,.7,.4,0]]},
+  C29b:{img:18, shot:"CU 시리즈", label:"C-29", k:[[0,1.95,.44,.4,0],[1,2.1,.44,.38,0]]},
+  C29c:{img:8, shot:"CU 시리즈", label:"C-29", k:[[0,1.3,.8,.36,0],[1,1.42,.8,.34,0]]},
+  C29d:{img:32, shot:"CU 시리즈", label:"C-29", k:[[0,1.9,.2,.62,0],[1,2.05,.2,.6,0]]},
+  C30:{img:30, shot:"CU 시리즈", k:[[0,1.0,.46,.5,0],[.7,1.3,.46,.44,0],[1,1.34,.46,.44,0]]},
+  C31:{img:31, shot:"WS · Slow Tilt-up", k:[[0,1.42,.5,.9,0],[1,1.1,.5,.2,0]]},
+  C32:{img:32, shot:"MS · 예비", k:[[0,1.08,.5,.5,0],[1,1.18,.5,.48,0]], tin:{fade:.4}},
+  C33:{img:33, shot:"EWS · Drone · 예비", k:[[0,1.7,.54,.5,5],[1,1.0,.5,.5,0,"out"]], tin:{fade:.4}},
+  C34:{logo:true, shot:"로고"},
+};
+// 스토리보드 자막
+const SUBS = [
+  {a:"C01",b:"C01",m:"정상을 향한 조준",cls:"title",at:1.0},
+  {a:"C02",b:"C02",m:"흔들림 없는 집중",cls:"title",at:.6},
+  {a:"C03",b:"C03",m:"선배의 꿈이 후배에게 닿는다",cls:"title",at:.7},
+  {a:"C04",b:"C04",m:"정상을 향한 조준, 성문에서 당신의 변화가 시작되다",cls:"copy",at:1.6},
+  {a:"C05",b:"C05",m:"안양을 담은 조망, 몰입을 위한 시그니처 공간",s:"100석 규모 개방형 스터디 카페"},
+  {a:"C06",b:"C06",m:"교실의 경계를 넘어 꿈을 설계하는 창의적 배움터",s:"대학 강의실형 세미나실 · 개방형 교실"},
+  {a:"C07",b:"C07",m:"함께하는 3년의 여정, 1:1 맞춤형 케어의 완성",s:"단계별 심화 학습반 · 전담 교사 밀착 관리"},
+  {a:"C09",b:"C09",m:"검증된 환경, 미래를 선도하는 200억 교육사업 선정",s:"AI·디지털 활용 교육 · 국제교육협력사업 · 경기예술365+ · 미래형 과학실 등"},
+  {a:"C11",b:"C11",m:"스스로 설계하는 내일, 선택의 기회",s:"선택 중심 교육과정"},
+  {a:"C12",b:"C12",m:"배움이 머무는 모든 공간"},
+  {a:"C15",b:"C15",m:"국가대표급 에너지, 땀방울로 증명하는 투지",at:1.55},
+  {a:"C16",b:"C16",m:"생각의 깊이가 실력이 되는 시간",s:"인문·독서 동아리"},
+  {a:"C19",b:"C19",m:"인문 · 과학 · 예술 정규 동아리",at:.9},
+  {a:"C20",b:"C20",m:"안양·과천 전 지역 30분, 컨디션까지 배려하는 등굣길",s:"스쿨버스 24대 운행"},
+  {a:"C22",b:"C22",m:"정성이 담긴 식사, 가족처럼 따뜻한 성문 공동체",s:"자체 급식 · 사회적협동조합 매점"},
+  {a:"C24a",b:"C24c",m:"사랑과 섬김의 요람, 인성이 실력이 되는 순간",s:"채플 · 버스킹 · 예체능 동아리"},
+  {a:"C26",b:"C26",m:"함께 만든 결실, 합격의 환희로 증명하는 성과",s:"최상위권 대입 실적",at:1.05},
+  {a:"C27",b:"C28",m:"국가가 인정한 공신력, 세계로 뻗어가는 글로벌 성문",s:"미국 위스콘신대학교 MOU 체결 · 수능 유공 교육부 장관 표창"},
+  {a:"C31",b:"C31",html:"<small>정상을 향한 조준,</small>성문에서 정점이 되다",cls:"slogan",at:2.3,rise:1.2},
+];
+
+const W=1920,H=1080, $=(s)=>document.querySelector(s);
+const cutById={}; TL.cuts.forEach((c,i)=>{c.i=i;c.end=c.start+c.dur;cutById[c.id]=c;});
+const anims=[];
+function A(el,kf,start,dur,easing){ // 절대 시간 기준 애니메이션 등록
+  const a=el.animate(kf,{duration:Math.max(1,dur*1000),delay:start*1000,fill:"both",easing:easing||"cubic-bezier(.2,.7,.2,1)"}); a.pause(); anims.push(a); return a;
+}
+const ease={io:t=>.5-.5*Math.cos(Math.PI*t), out:t=>1-Math.pow(1-t,3), in:t=>t*t*t, lin:t=>t};
+function camAt(k,p){
+  if(p<=k[0][0]) return k[0]; if(p>=k[k.length-1][0]) return k[k.length-1];
+  for(let i=1;i<k.length;i++) if(p<=k[i][0]){const a=k[i-1],b=k[i],u=ease[b[5]||"io"]((p-a[0])/(b[0]-a[0])); return [p,a[1]+(b[1]-a[1])*u,a[2]+(b[2]-a[2])*u,a[3]+(b[3]-a[3])*u,a[4]+(b[4]-a[4])*u];}
+}
+function lastBeat(t){let lo=0,hi=TL.beats.length-1,r=-9;while(lo<=hi){const m=(lo+hi)>>1; if(TL.beats[m]<=t){r=TL.beats[m];lo=m+1}else hi=m-1} return r;}
+
+// --- 컷 DOM 구성
+const imgs=[];
+TL.cuts.forEach(c=>{
+  const sp=SPEC[c.id], d=document.createElement("div"); d.className="cut"; d.style.zIndex=c.i+1; c.el=d; c.sp=sp;
+  if(sp.logo){ d.innerHTML='<div id="logo"><div class="n">성문고등학교</div><div class="l"></div><div class="p">로고 자리 · 학교 CI 수령 후 교체</div></div>'; }
+  else{
+    const r=document.createElement("div"); r.className="rot"; const im=new Image(); im.className="bg"; im.src=REF+"/c"+String(sp.img).padStart(2,"0")+".jpg"; imgs.push(im); r.appendChild(im); d.appendChild(r); c.rot=r; c.im=im;
+    if(sp.tint){const t=document.createElement("div");t.className="ov";t.style.background=sp.tint;t.style.mixBlendMode="screen";d.appendChild(t);}
+    if(sp.door){ ["l","r"].forEach(s=>{const p=document.createElement("div");p.className="door "+s;d.appendChild(p);
+      A(p,[{transform:"translateX(0)"},{transform:"translateX("+(s=="l"?"-104%":"104%")+")"}],c.start+c.dur*.4,c.dur*.32,"cubic-bezier(.6,0,.2,1)");}); }
+  }
+  $("#cuts").appendChild(d);
+});
+
+// --- 자막
+SUBS.forEach(s=>{
+  const a=cutById[s.a], b=cutById[s.b], el=document.createElement("div"); el.className="sub "+(s.cls||"");
+  el.innerHTML='<div class="m">'+(s.html||s.m)+'</div>'+(s.s?'<div class="s">'+s.s+'</div>':'');
+  $("#subs").appendChild(el);
+  const na=TL.na.find(n=>n.start>=a.start-0.01 && n.start<a.end); let t0=a.start+(s.at!==undefined?s.at:(na?na.start-a.start-.15:.4)); const t1=b.end-.22, rise=s.rise||.42;
+  A(el,[{opacity:0,transform:"translateY(16px)"},{opacity:1,transform:"translateY(0)"}],t0,rise);
+  const o=el.animate([{opacity:1},{opacity:0}],{duration:200,delay:t1*1000,fill:"forwards",composite:"replace"}); o.pause(); anims.push(o); s.t0=t0; s.t1=t1; s.el=el;
+});
+
+// --- C-09 엠블럼: 태블릿 주위에 떠올랐다가 태블릿 안으로 빨려 들어간다
+(function(){ const c=cutById.C09; if(!c) return; const E=[["AI 중점학교",250,170],["미래형 과학실",1330,150],["AI·디지털 활용 교육",120,430],["국제교육협력사업",1400,400],["경기예술365+",560,90]]; const tx=1150,ty=600;
+  E.forEach((e,i)=>{const el=document.createElement("div"); el.className="emb"; el.innerHTML="<i></i>"+e[0]; el.style.left=e[1]+"px"; el.style.top=e[2]+"px"; $("#fx").appendChild(el);
+    const dx=tx-e[1]-150, dy=ty-e[2]-40, t0=c.start+.35+i*.3;
+    A(el,[{opacity:0,transform:"translateY(30px) scale(.3)",offset:0},{opacity:1,transform:"translateY(0) scale(1.08)",offset:.6},{opacity:1,transform:"translateY(0) scale(1)",offset:1}],t0,.5);
+    const f=el.animate([{opacity:1,transform:"translate(0,0) scale(1)"},{opacity:1,transform:`translate(${dx*.6}px,${dy*.6}px) scale(.6)`,offset:.6},{opacity:0,transform:`translate(${dx}px,${dy}px) scale(.08)`}],{duration:650,delay:(c.start+c.dur*.66+i*.11)*1000,fill:"forwards",easing:"cubic-bezier(.5,0,.8,.4)"}); f.pause(); anims.push(f); });
+})();
+// --- C-11 과목 키워드 스트림 (과목명은 임시 예시)
+(function(){ const c=cutById.C11; if(!c) return; const K=[["인공지능 기초","심화 수학","세계사","생명과학 실험","미디어 영어","경제","프로그래밍","물리학","심리학","음악 연주와 창작"],["데이터 과학","철학","국제 관계의 이해","화학","스포츠 생활","미술 창작","지구과학","정보","문학과 매체","기하"],["확률과 통계","영미 문학 읽기","정치와 법","로봇 공학","교육학","융합과학 탐구","일본어","중국어","사회문제 탐구","연극"]];
+  [[150,50,-1,.8],[610,40,1,.7]].forEach((r,i)=>{const el=document.createElement("div"); el.className="kwrow"; el.style.top=r[0]+"px"; el.style.fontSize=r[1]+"px"; el.style.opacity=0; el.innerHTML=(K[i].concat(K[i])).map(w=>"<span>"+w+"</span>").join(""); $("#fx").appendChild(el);
+    const from=r[2]<0?400:-2600, to=r[2]<0?-2600:400; A(el,[{transform:`translateX(${from}px)`},{transform:`translateX(${to}px)`}],c.start,c.dur,"linear");
+    const o=el.animate([{opacity:0},{opacity:r[3],offset:.1},{opacity:r[3],offset:.9},{opacity:0}],{duration:c.dur*1000,delay:c.start*1000,fill:"both"}); o.pause(); anims.push(o); });
+})();
+// --- C-12 시설 라벨 (해바라기 배열 순서대로)
+(function(){ const c=cutById.C12; if(!c) return; const L=[["체육관",960,560],["스터디 카페",1500,230],["컴퓨터실",1640,620],["과학실",1390,900],["도서실",520,900],["급식실",280,620],["운동장",420,230]];
+  L.forEach((l,i)=>{const el=document.createElement("div"); el.className="lab"; el.textContent=l[0]; el.style.left=l[1]+"px"; el.style.top=(l[2]-90)+"px"; $("#fx").appendChild(el);
+    const t0=c.start+c.dur*.36+i*(c.dur*.42/7);
+    A(el,[{transform:"translate(-50%,-50%) scale(0)"},{transform:"translate(-50%,-50%) scale(1.15)",offset:.6},{transform:"translate(-50%,-50%) scale(1)"}],t0,.32);
+    const o=el.animate([{opacity:1},{opacity:0}],{duration:150,delay:(c.end-.15)*1000,fill:"forwards"}); o.pause(); anims.push(o); });
+})();
+// --- C-34 로고 자리
+(function(){ const c=cutById.C34; if(!c) return; const L=c.el.querySelector("#logo");
+  A(L.querySelector(".n"),[{opacity:0,letterSpacing:".3em"},{opacity:1,letterSpacing:".08em"}],c.start+.5,1.3,"cubic-bezier(.2,.7,.2,1)");
+  A(L.querySelector(".l"),[{width:"0px"},{width:"420px"}],c.start+1.0,1.0); A(L.querySelector(".p"),[{opacity:0},{opacity:1}],c.start+1.6,.8);
+})();
+
+// 화면 전체 효과: [시각, 길이, 최대 불투명도]
+const FL=[[cutById.C03.start+.42,.5,.85],[cutById.C14.start+cutById.C14.dur*.53,.28,.5],[cutById.C26.start,.7,.9],[cutById.C31.start,.6,.6],[cutById.C24c.start,.3,.45]];
+const WHITE_IN=cutById.C34.start; // 로고 컷 앞 화이트 디졸브
+
+function layout(){ TL.cuts.forEach(c=>{ if(!c.im) return; const a=c.im.naturalWidth/c.im.naturalHeight; if(a>=W/H){c.bh=H;c.bw=H*a}else{c.bw=W;c.bh=W/a} c.im.style.width=c.bw+"px"; c.im.style.height=c.bh+"px"; }); }
+
+window.seek=function(t){
+  let cur=null;
+  TL.cuts.forEach(c=>{
+    const next=TL.cuts[c.i+1], fin=c.sp.tin&&c.sp.tin.fade||0, nfade=next&&next.sp.tin&&next.sp.tin.fade||0;
+    const vis = t>=c.start && t<c.end+nfade;
+    c.el.style.display=vis?"block":"none"; if(!vis) return;
+    if(t<c.end) cur=c;
+    c.el.style.opacity = fin? Math.min(1,(t-c.start)/fin) : 1;
+    if(c.id==="C34") c.el.style.opacity=Math.min(1,(t-c.start+.5)/.5);
+    if(!c.im) return;
+    const sp=c.sp, p=(t-c.start)/c.dur, k=camAt(sp.k,Math.min(1.2,Math.max(0,p)));
+    let s=k[1], fx=k[2], fy=k[3], r=k[4];
+    if(sp.pulse){const d=t-lastBeat(t); s*=1+sp.pulse*Math.exp(-7*d);}
+    if(sp.breathe){ s*=1+.012*Math.sin((t-c.start)*2*Math.PI/1.6); }
+    const w=c.bw*s, h=c.bh*s; let x=W/2-fx*w, y=H/2-fy*h;
+    if(sp.shake){ const m=sp.shake*(c.id==="C03"&&p>.17?.4:1); x+=m*(Math.sin(t*37.1)+.6*Math.sin(t*61.7+1)); y+=m*(Math.sin(t*43.3+2)+.6*Math.sin(t*71.9)); }
+    x=Math.min(0,Math.max(W-w,x)); y=Math.min(0,Math.max(H-h,y));
+    c.im.style.transform=`translate(${x.toFixed(2)}px,${y.toFixed(2)}px) scale(${s.toFixed(5)})`;
+    c.rot.style.transform=r?`rotate(${r.toFixed(3)}deg) scale(${(1+Math.abs(r)*.03).toFixed(4)})`:"";
+    if(sp.rack){ const b=Math.max(0,1-p/.55)*9; c.im.style.filter=b>.05?`blur(${b.toFixed(2)}px)`:"none"; }
+  });
+  // C-34 직전 0.5초부터 화이트로 넘어간다
+  const c34=cutById.C34; if(t>=c34.start-.5 && t<c34.start){ c34.el.style.display="block"; c34.el.style.opacity=(t-(c34.start-.5))/.5; }
+  let f=0; FL.forEach(([t0,d,pk])=>{ if(t>=t0&&t<t0+d){ const u=(t-t0)/d; f=Math.max(f,pk*(u<.12?u/.12:1-(u-.12)/.88)); } });
+  $("#flash").style.opacity=f;
+  $("#dark").style.opacity = cur&&cur.sp.dark? cur.sp.dark : (t<1.2? 0 : 0);
+  const end=TL.total; $("#dark").style.opacity = Math.max(parseFloat($("#dark").style.opacity)||0, t>end-.6? (t-(end-.6))/.6 : 0);
+  $("#grad").style.opacity = (cur&&cur.id==="C34")?0:1;
+  if(cur){ const tg=$("#tag"); tg.style.display=SHOW_TAG?"flex":"none"; tg.className=cur.id==="C34"?"light":"";
+    tg.innerHTML=`<span>SCENE ${cur.scene} · ${SCENES[cur.scene]}</span><span class="c">${cur.sp.label||cur.id.replace("C","C-")}</span><span>${cur.sp.shot}</span>`; }
+  anims.forEach(a=>{a.currentTime=t*1000;});
+};
+window.ready=Promise.all(imgs.map(im=>im.decode?im.decode().catch(()=>{}):Promise.resolve())).then(()=>document.fonts.ready).then(()=>{layout();window.seek(0);return true;});
+</script>
+</body>
+</html>
